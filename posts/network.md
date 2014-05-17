@@ -49,14 +49,24 @@ ln -s /dev/null /etc/udev/rules.d/80-net-setup-link.rules
 Note: the last line disables udevd's new naming scheme for network interfaces. Currently, the ethernet driver of the odroid u2 does not implement name changes (at least I think it's the driver). And there is only one ethernet on the board anyway (unless one connets another one via the USB). So disabling it guarantees no sad accidents in the future.
 For more info, see [udevd explanation about naming scheme](http://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames/).
 
+### Avahi Daemon ###
+TODO 
+dhcp
+`sed -i 's,#\(disallow-other-stacks\)=.*,\1=yes'`
+
+The last line [fixes a conflict](https://forums.gentoo.org/viewtopic-p-7404160.html) between the new release of avahi and old kernels (< 3.9).
+
 ### Install & Configure SSH Server. ###
 
 ```bash
 pacman -S --noconfirm openssh
-systemctl enable sshd 
+systemctl enable sshd.socket
 ```
 
 The default configuration is good enough. If you want more, here is a [nice article](http://www.cyberciti.biz/tips/linux-unix-bsd-openssh-server-best-practices.html).
+
+I choose to have [systemd socket activation][] (inted style) for sshd since it is not running very frequently. Configuring it to run always as normal daemon is fairly easy as well, run `systemctl enable sshd` instead of enabling the socket.
+
 Additionally, one may add public key to the authorized keys in the .ssh dir of the user.
 
 ```bash
@@ -151,4 +161,4 @@ sudo systemctl reload sshd
 ```
 
 [base system]: base-system.html
-
+[systemd socket activation] http://0pointer.de/blog/projects/socket-activated-containers.html
